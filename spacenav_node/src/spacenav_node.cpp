@@ -40,7 +40,7 @@
 #include "spnav.h"  // NOLINT
 
 #include "geometry_msgs/Vector3.h"
-#include "geometry_msgs/Twist.h"
+#include "geometry_msgs/TwistStamped.h"
 #include "sensor_msgs/Joy.h"
 
 /** Ensure that the vector parameter has three components.
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
   ros::NodeHandle node_handle;
   ros::Publisher offset_pub = node_handle.advertise<geometry_msgs::Vector3>("spacenav/offset", 2);
   ros::Publisher rot_offset_pub = node_handle.advertise<geometry_msgs::Vector3>("spacenav/rot_offset", 2);
-  ros::Publisher twist_pub = node_handle.advertise<geometry_msgs::Twist>("spacenav/twist", 2);
+  ros::Publisher twist_pub = node_handle.advertise<geometry_msgs::TwistStamped>("spacenav/twist", 2);
   ros::Publisher joy_pub = node_handle.advertise<sensor_msgs::Joy>("spacenav/joy", 2);
 
   // Used to scale joystick output to be in [-1, 1]. Estimated from data, and not necessarily correct.
@@ -228,9 +228,10 @@ int main(int argc, char **argv)
       rot_offset_msg.z = normed_wz * angular_scale[2];
       rot_offset_pub.publish(rot_offset_msg);
 
-      geometry_msgs::Twist twist_msg;
-      twist_msg.linear = offset_msg;
-      twist_msg.angular = rot_offset_msg;
+      geometry_msgs::TwistStamped twist_msg;
+      twist_msg.header.stamp = ros::Time::now();
+      twist_msg.twist.linear = offset_msg;
+      twist_msg.twist.angular = rot_offset_msg;
       twist_pub.publish(twist_msg);
 
       // The joystick.axes are normalized within [-1, 1].
