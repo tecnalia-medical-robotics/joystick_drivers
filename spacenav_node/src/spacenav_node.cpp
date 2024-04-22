@@ -150,6 +150,7 @@ int main(int argc, char **argv)
   double normed_wx = 0;
   double normed_wy = 0;
   double normed_wz = 0;
+  int seq_ctr = 0;
 
   while (node_handle.ok())
   {
@@ -230,6 +231,7 @@ int main(int argc, char **argv)
 
       geometry_msgs::TwistStamped twist_msg;
       twist_msg.header.stamp = ros::Time::now();
+      twist_msg.header.seq = seq_ctr;
       twist_msg.twist.linear = offset_msg;
       twist_msg.twist.angular = rot_offset_msg;
       twist_pub.publish(twist_msg);
@@ -245,6 +247,7 @@ int main(int argc, char **argv)
       no_motion_count = 0;
       motion_stale = false;
       joy_stale = true;
+      seq_ctr++;
     }
 
     if (joy_stale)
